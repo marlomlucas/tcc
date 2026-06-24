@@ -1,0 +1,11 @@
+Libera temporariamente a execução de scripts = Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+Ativa ambiente virtual = .\.venv\Scripts\Activate.ps1
+
+Roda server = python manage.py runserver
+
+
+http://127.0.0.1:8000/admin/
+admin
+admin@atl.com
+123@@Aa123
