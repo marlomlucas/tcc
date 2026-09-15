@@ -1,0 +1,13 @@
+.\.venv\Scripts\Activate.ps1
+
+python manage.py check
+
+python manage.py makemigrations --check --dry-run
+
+python -m pip check
+
+python manage.py runserver
+
+
+/api/produtos/7891234567890/
+/api/docs/

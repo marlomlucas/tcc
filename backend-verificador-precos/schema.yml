@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: API Verificador de Preços
+  version: 1.0.0
+  description: API REST responsável pela consulta de produtos através do código de
+    barras.
+paths:
+  /api/produtos/{codigo_barra}/:
+    get:
+      operationId: produtos_retrieve
+      parameters:
+      - in: path
+        name: codigo_barra
+        schema:
+          type: string
+        required: true
+      tags:
+      - produtos
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Produto'
+          description: ''
+components:
+  schemas:
+    Produto:
+      type: object
+      properties:
+        codigo_barra:
+          type: string
+          title: Código de Barras
+          maxLength: 20
+        nome:
+          type: string
+          maxLength: 150
+        descricao:
+          type: string
+          title: Descrição
+        preco:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          title: Preço
+        data_atualizacao:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Data de Atualização
+      required:
+      - codigo_barra
+      - data_atualizacao
+      - nome
+      - preco
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

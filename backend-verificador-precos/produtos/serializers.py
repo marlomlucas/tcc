@@ -12,3 +12,7 @@ class ProdutoSerializer(serializers.ModelSerializer):
             "preco",
             "data_atualizacao"
         ]
+
+# Define o formato das mensagens de erro retornadas pela API.
+class ErroSerializer(serializers.Serializer):
+    erro = serializers.CharField()

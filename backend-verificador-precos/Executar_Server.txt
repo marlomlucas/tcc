@@ -5,7 +5,13 @@ Ativa ambiente virtual = .\.venv\Scripts\Activate.ps1
 Roda server = python manage.py runserver
 
 
+=== Executar_BancoSQL ===
+Executar -> services.msc
+Procure -> MySQL80
+
+
 http://127.0.0.1:8000/admin/
+http://127.0.0.1:8000/api/produtos/7891234567890/
 admin
 admin@atl.com
 123@@Aa123
