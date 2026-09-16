@@ -106,3 +106,66 @@ class ProdutoAPITests(APITestCase):
             response.data["erro"],
             "Código de barras inválido."
         )
+        
+    def test_conteudo_completo_produto(self):
+        # Monta a URL utilizando o produto criado no setUp.
+        url = reverse(
+            "produto-por-codigo",
+            kwargs={"codigo_barra": self.produto.codigo_barra}
+        )
+
+        response = self.client.get(url)
+
+        # Confirma que a consulta foi realizada com sucesso.
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        # Verifica os dados retornados pela API.
+        self.assertEqual(
+            response.data["codigo_barra"],
+            "7891234567890"
+        )
+
+        self.assertEqual(
+            response.data["nome"],
+            "Arroz Tipo 1"
+        )
+
+        self.assertEqual(
+            response.data["descricao"],
+            "Arroz branco 5kg"
+        )
+
+        self.assertEqual(
+            response.data["preco"],
+            "24.90"
+        )
+
+        # Verifica se a data de atualização foi retornada.
+        self.assertIn(
+            "data_atualizacao",
+            response.data
+        )
+ 
+    def test_schema_openapi_disponivel(self):
+        # Utiliza a rota definida para o schema OpenAPI.
+        url = reverse("schema")
+
+        response = self.client.get(url)
+
+        # Verifica se o schema foi gerado corretamente.
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        # Converte o conteúdo retornado para texto.
+        conteudo = response.content.decode("utf-8")
+
+        # Confirma que o endpoint de produtos está documentado no schema.
+        self.assertIn(
+            "/api/produtos/{codigo_barra}/",
+            conteudo
+        )
