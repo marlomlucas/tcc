@@ -2,7 +2,9 @@ Libera temporariamente a execução de scripts = Set-ExecutionPolicy -Scope Proc
 
 Ativa ambiente virtual = .\.venv\Scripts\Activate.ps1
 
-Roda server = python manage.py runserver
+Roda server:
+Local = python manage.py runserver
+Rede = python manage.py runserver 0.0.0.0:8000
 
 
 === Executar_BancoSQL ===
