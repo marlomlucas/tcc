@@ -17,6 +17,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"http://192.168.100.4:8000/\""
+        )
     }
 
     buildTypes {
@@ -32,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true // Permite gerar a classe BuildConfig. usada para guardar a URL da API fora do código Kotlin principal.
     }
 }
 
@@ -51,4 +58,18 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+
+    // Retrofit - comunicação HTTP com o backend
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+
+    // Conversão entre JSON e objetos Kotlin usando Moshi
+    implementation("com.squareup.retrofit2:converter-moshi:3.0.0")
+
+    // Suporte do Moshi para classes Kotlin
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
+
+    // ViewModel utilizado na arquitetura MVVM
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0")
 }
