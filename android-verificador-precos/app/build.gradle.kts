@@ -59,6 +59,16 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
+    // CameraX
+    val cameraxVersion = "1.6.2"
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+
+    // ML Kit - leitura de códigos de barras
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
     // Retrofit - comunicação HTTP com o backend
     implementation("com.squareup.retrofit2:retrofit:3.0.0")

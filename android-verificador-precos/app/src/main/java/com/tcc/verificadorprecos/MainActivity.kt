@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tcc.verificadorprecos.ui.theme.VerificadorPrecosTheme
 import com.tcc.verificadorprecos.viewmodel.ProdutoUiState
 import com.tcc.verificadorprecos.viewmodel.ProdutoViewModel
+import com.tcc.verificadorprecos.camera.CameraPreview
 
 class MainActivity : ComponentActivity() {
 
@@ -58,6 +59,10 @@ fun TelaVerificadorPrecos(
         mutableStateOf("")
     }
 
+    var leituraAtiva by remember {
+        mutableStateOf(true)
+    }
+
     val uiState by produtoViewModel.uiState.collectAsState()
 
     Column(
@@ -73,7 +78,28 @@ fun TelaVerificadorPrecos(
         )
 
         Spacer(
-            modifier = Modifier.height(32.dp)
+            modifier = Modifier.height(24.dp)
+        )
+
+        CameraPreview(
+            onCodigoDetectado = { codigo ->
+
+                if (leituraAtiva) {
+
+                    leituraAtiva = false
+
+                    codigoBarra = codigo
+
+                    produtoViewModel.consultarProduto(codigo)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+        )
+
+        Spacer(
+            modifier = Modifier.height(24.dp)
         )
 
         OutlinedTextField(
@@ -94,13 +120,34 @@ fun TelaVerificadorPrecos(
 
         Button(
             onClick = {
+
+                leituraAtiva = false
+
                 produtoViewModel.consultarProduto(codigoBarra)
             },
             enabled = uiState !is ProdutoUiState.Carregando,
             modifier = Modifier.fillMaxWidth()
         ) {
-
             Text("Consultar")
+        }
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        Button(
+            onClick = {
+
+                codigoBarra = ""
+
+                produtoViewModel.limpar()
+
+                leituraAtiva = true
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            Text("Nova leitura")
         }
 
         Spacer(
