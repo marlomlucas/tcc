@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -24,13 +25,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tcc.verificadorprecos.camera.CameraPreview
 import com.tcc.verificadorprecos.ui.theme.VerificadorPrecosTheme
 import com.tcc.verificadorprecos.viewmodel.ProdutoUiState
 import com.tcc.verificadorprecos.viewmodel.ProdutoViewModel
-import com.tcc.verificadorprecos.camera.CameraPreview
+import java.text.NumberFormat
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
@@ -111,6 +115,10 @@ fun TelaVerificadorPrecos(
                 Text("Código de barras")
             },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -236,7 +244,11 @@ fun TelaVerificadorPrecos(
                     fontWeight = FontWeight.Bold
                 )
 
-                Text("R$ ${produto.preco}")
+                Text(
+                    text = formatarPreco(produto.preco),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             is ProdutoUiState.Erro -> {
@@ -248,6 +260,22 @@ fun TelaVerificadorPrecos(
                 )
             }
         }
+    }
+}
+
+fun formatarPreco(preco: String): String {
+
+    val valor = preco.toBigDecimalOrNull()
+
+    return if (valor != null) {
+
+        NumberFormat
+            .getCurrencyInstance(Locale.forLanguageTag("pt-BR"))
+            .format(valor)
+
+    } else {
+
+        preco
     }
 }
 
