@@ -3,12 +3,13 @@ package com.tcc.verificadorprecos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tcc.verificadorprecos.data.ProdutoDto
-import com.tcc.verificadorprecos.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
+import com.tcc.verificadorprecos.repository.ProdutoRepository
+import com.tcc.verificadorprecos.repository.ProdutoRepositoryImpl
 
 sealed interface ProdutoUiState {
 
@@ -25,7 +26,11 @@ sealed interface ProdutoUiState {
     ) : ProdutoUiState
 }
 
-class ProdutoViewModel : ViewModel() {
+class ProdutoViewModel(
+    private val repository: ProdutoRepository
+) : ViewModel() {
+
+    constructor() : this(ProdutoRepositoryImpl())
 
     private val _uiState =
         MutableStateFlow<ProdutoUiState>(ProdutoUiState.Inicial)
@@ -50,7 +55,7 @@ class ProdutoViewModel : ViewModel() {
             try {
 
                 val response =
-                    RetrofitClient.produtoApi.consultarProduto(codigo)
+                    repository.consultarProduto(codigo)
 
                 if (response.isSuccessful) {
 
