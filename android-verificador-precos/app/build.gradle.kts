@@ -83,4 +83,11 @@ dependencies {
     // ViewModel utilizado na arquitetura MVVM
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0")
+
+
+    // Coil - carregamento de imagens dos produtos
+    val coilVersion = "3.4.0"
+
+    implementation("io.coil-kt.coil3:coil-compose:$coilVersion")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:$coilVersion")
 }

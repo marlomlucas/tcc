@@ -1,9 +1,9 @@
+
 package com.tcc.verificadorprecos.data
 
 import com.squareup.moshi.Json
 
 data class ProdutoDto(
-
     @Json(name = "codigo_barra")
     val codigoBarra: String,
 
@@ -14,5 +14,7 @@ data class ProdutoDto(
     val preco: String,
 
     @Json(name = "data_atualizacao")
-    val dataAtualizacao: String
+    val dataAtualizacao: String,
+
+    val imagem: String? = null
 )

@@ -3,6 +3,7 @@ from .models import Produto
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Produto
         fields = [
@@ -10,8 +11,10 @@ class ProdutoSerializer(serializers.ModelSerializer):
             "nome",
             "descricao",
             "preco",
-            "data_atualizacao"
+            "data_atualizacao",
+            "imagem"
         ]
+
 
 # Define o formato das mensagens de erro retornadas pela API.
 class ErroSerializer(serializers.Serializer):

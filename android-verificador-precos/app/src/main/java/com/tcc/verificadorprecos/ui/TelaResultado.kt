@@ -20,6 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tcc.verificadorprecos.data.ProdutoDto
 import com.tcc.verificadorprecos.formatarPreco
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.SubcomposeAsyncImage
 
 @Composable
 fun TelaResultado(
@@ -53,6 +59,51 @@ fun TelaResultado(
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Bold
             )
+        }
+
+
+        // Exibe a fotografia quando o produto possui imagem cadastrada.
+        if (!produto.imagem.isNullOrBlank()) {
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            ) {
+
+                SubcomposeAsyncImage(
+                    model = produto.imagem,
+                    contentDescription = "Imagem do produto ${produto.nome}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(190.dp)
+                        .padding(12.dp),
+                    contentScale = ContentScale.Fit,
+
+                    loading = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    },
+
+                    error = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Imagem indisponível",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                )
+            }
         }
 
 
