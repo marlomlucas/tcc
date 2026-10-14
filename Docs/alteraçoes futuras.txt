@@ -1,3 +1,5 @@
 imagem produto deve ser renomeada pelo cod barras do produto, não sendo necessário um campo para isso no sql
 
 Add QR-Code
+
+ajustar .gitignore
