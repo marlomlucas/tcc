@@ -2,3 +2,5 @@
 .venv/
 __pycache__/
 *.pyc
+/backend-verificador-precos/media/img_produtos
+/backend-verificador-precos/media/img_produtos
