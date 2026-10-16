@@ -1,5 +1,5 @@
-imagem produto deve ser renomeada pelo cod barras do produto, não sendo necessário um campo para isso no sql
+Exclusão de produtos: garantir que a exclusão no Django Admin também elimine a imagem correspondente.
+
+Formulário de cadastro, campo invalido recarrega pagina e limpa a imagem.
 
 Add QR-Code
-
-ajustar .gitignore

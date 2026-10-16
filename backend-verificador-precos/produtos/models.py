@@ -25,14 +25,6 @@ class Produto(models.Model):
         verbose_name="Descrição"
     )
 
-    # Imagem opcional do produto.
-    # O arquivo será armazenado no diretório de mídias do Django.
-    imagem = models.ImageField(
-        upload_to="img_produtos/",
-        blank=True,
-        verbose_name="Imagem do Produto"
-    )
-
     # Preço do produto.
     # Coloquei DecimalField por ser mais adequado para valores monetários.
     preco = models.DecimalField(

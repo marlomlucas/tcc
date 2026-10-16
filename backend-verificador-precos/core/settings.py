@@ -114,7 +114,22 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Configurações para imagens enviadas pelo Django Admin.
+
+# URL de mídias no ambiente de desenvolvimento.
 MEDIA_URL = "/media/"
 
-MEDIA_ROOT = BASE_DIR / "media"
+# Diretório físico onde as fotografias serão armazenadas.
+MEDIA_ROOT = Path(
+    os.environ.get(
+        "IMAGENS_STORAGE_ROOT",
+        str(BASE_DIR / "media")
+    )
+)
+
+# Prefixo público configurável da URL das imagens.
+IMAGENS_BASE_URL = (
+    os.environ["IMAGENS_BASE_URL"].strip().rstrip("/") + "/"
+)
+
+# Nome fixo da pasta das fotografias.
+IMAGENS_SUBPASTA = "img_produtos"
