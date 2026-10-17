@@ -7,16 +7,24 @@ from .forms import ProdutoAdminForm
 from .imagens import (
     caminho_imagem_produto,
     salvar_imagem_produto,
+    excluir_imagem_produto,
 )
-from .models import Produto
 
+from .models import Produto
+import logging
+from django.db import transaction
+
+logger = logging.getLogger(__name__)
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
 
     # Formulário personalizado para receber a imagem.
     form = ProdutoAdminForm
-
+    
+    # Desabilita ações em lote no Django Admin. "Trava de segurança."
+    actions = None
+    
     list_display = (
         "nome",
         "codigo_barra",
@@ -102,3 +110,28 @@ class ProdutoAdmin(admin.ModelAdmin):
                 ),
                 level=messages.ERROR
             )
+
+
+    def delete_model(self, request, obj):
+        """
+        Exclui o produto e agenda a remoção da imagem
+        após a confirmação da transação no banco.
+        """
+
+        codigo_barra = obj.codigo_barra
+
+        # Exclui o produto do banco de dados.
+        super().delete_model(request, obj)
+
+        # Executa a exclusão da imagem após o commit.
+        def remover_imagem():
+            try:
+                excluir_imagem_produto(codigo_barra)
+
+            except OSError:
+                logger.exception(
+                    "Erro ao excluir a imagem do produto %s",
+                    codigo_barra
+                )
+
+        transaction.on_commit(remover_imagem)

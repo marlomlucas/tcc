@@ -1,4 +1,3 @@
-
 from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -9,7 +8,10 @@ from django.test import SimpleTestCase, override_settings
 
 from PIL import Image
 
-from .imagens import salvar_imagem_produto
+from .imagens import (
+    salvar_imagem_produto,
+    excluir_imagem_produto,
+)
 
 
 class TesteImagens(SimpleTestCase):
@@ -118,3 +120,30 @@ class TesteImagens(SimpleTestCase):
                 "../produto",
                 self.criar_imagem("red")
             )
+
+
+
+    def test_excluir_imagem_existente(self):
+        codigo = "12345670"
+
+        # Cria uma imagem de teste.
+        caminho = salvar_imagem_produto(
+            codigo,
+            self.criar_imagem("red")
+        )
+
+        self.assertTrue(caminho.exists())
+
+        # Exclui a imagem.
+        resultado = excluir_imagem_produto(codigo)
+
+        self.assertTrue(resultado)
+        self.assertFalse(caminho.exists())
+
+    def test_excluir_imagem_inexistente(self):
+        codigo = "12345670"
+
+        # Tenta excluir uma imagem inexistente.
+        resultado = excluir_imagem_produto(codigo)
+
+        self.assertFalse(resultado)

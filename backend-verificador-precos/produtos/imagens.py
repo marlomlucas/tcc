@@ -143,3 +143,21 @@ def salvar_imagem_produto(codigo_barra: str, arquivo) -> Path:
             temporario.unlink(missing_ok=True)
 
     return destino
+
+
+def excluir_imagem_produto(codigo_barra: str) -> bool:
+    """
+    Exclui a imagem associada ao código de barras.
+
+    Retorna True quando a imagem é excluída.
+    Retorna False quando a imagem não existe.
+    """
+
+    caminho = caminho_imagem_produto(codigo_barra)
+
+    try:
+        caminho.unlink()
+        return True
+
+    except FileNotFoundError:
+        return False
