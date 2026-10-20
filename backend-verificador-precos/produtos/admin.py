@@ -2,6 +2,7 @@ import os
 
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
+from .validacao_codigos import verificar_digito_verificador
 
 from .forms import ProdutoAdminForm
 from .imagens import (
@@ -24,6 +25,10 @@ class ProdutoAdmin(admin.ModelAdmin):
     
     # Desabilita ações em lote no Django Admin. "Trava de segurança."
     actions = None
+    
+    # Validação no navegador.
+    class Media:
+        js = ("produtos/js/validacao_produto.js",)
     
     list_display = (
         "nome",
@@ -110,6 +115,33 @@ class ProdutoAdmin(admin.ModelAdmin):
                 ),
                 level=messages.ERROR
             )
+        
+        # Verifica o dígito somente em novos cadastros
+        # ou quando o código de barras for alterado.
+        codigo_alterado = (
+            not change
+            or "codigo_barra" in form.changed_data
+        )
+
+        if codigo_alterado:
+
+            resultado = verificar_digito_verificador(
+                obj.codigo_barra
+            )
+
+            # A inconsistência gera apenas um aviso.
+            if resultado is False:
+                self.message_user(
+                    request,
+                    (
+                        "Produto cadastrado, porém o código de barras "
+                        "possui um possível erro no dígito verificador. "
+                        "** Caso for um código interno do estabelecimento, "
+                        "o cadastro pode ser mantido."
+                    ),
+                    level=messages.WARNING
+                )
+
 
 
     def delete_model(self, request, obj):
