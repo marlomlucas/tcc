@@ -10,7 +10,12 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
-DEBUG = True
+# Define o modo de execução por variável de ambiente.
+DEBUG = (
+    os.environ.get("DJANGO_DEBUG", "False")
+    .strip()
+    .lower() == "true"
+)
 
 ALLOWED_HOSTS = [
     host.strip()

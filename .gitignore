@@ -1,6 +1,18 @@
+
+# Variáveis de ambiente e credenciais
 .env
+.env.*
+!.env.example
+
+# Ambiente virtual Python
 .venv/
+
+# Arquivos temporários do Python
 __pycache__/
 *.pyc
-/backend-verificador-precos/media/img_produtos
-/backend-verificador-precos/media/img_produtos
+
+# Imagens e outros arquivos enviados ao sistema
+media/
+
+# Arquivos de log
+*.log
