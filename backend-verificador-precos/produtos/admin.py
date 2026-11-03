@@ -61,6 +61,10 @@ class ProdutoAdmin(admin.ModelAdmin):
 
         # Obtém a imagem enviada pelo formulário.
         nova_imagem = form.cleaned_data.get("imagem_upload")
+        imagem_preparada = form.imagem_preparada
+
+        if nova_imagem and imagem_preparada is None:
+            raise ValidationError("A imagem deve ser validada antes de salvar o produto.")
 
         # Salva os dados do produto no banco.
         super().save_model(request, obj, form, change)
@@ -70,7 +74,8 @@ class ProdutoAdmin(admin.ModelAdmin):
             if nova_imagem:
                 salvar_imagem_produto(
                     obj.codigo_barra,
-                    nova_imagem
+                    nova_imagem,
+                    imagem_preparada=imagem_preparada
                 )
 
             # Verifica se o código de barras foi alterado.

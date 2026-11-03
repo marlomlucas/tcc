@@ -3,6 +3,7 @@ import os
 import re
 import tempfile
 
+from io import BytesIO
 from pathlib import Path
 
 from django.conf import settings
@@ -39,15 +40,10 @@ def caminho_imagem_produto(codigo_barra: str) -> Path:
     )
 
 
-def salvar_imagem_produto(codigo_barra: str, arquivo) -> Path:
+def preparar_imagem_produto(arquivo) -> bytes:
     """
-    Recebe uma imagem, converte para WebP e salva
-    utilizando o código de barras como nome.
-
-    Se o arquivo já existir, será substituído.
+    Valida e converte a imagem integralmente em memória, sem criar arquivos.
     """
-
-    destino = caminho_imagem_produto(codigo_barra)
 
     # Valida o tamanho do arquivo enviado.
     tamanho = getattr(arquivo, "size", None)
@@ -56,8 +52,6 @@ def salvar_imagem_produto(codigo_barra: str, arquivo) -> Path:
         raise ValidationError(
             "A imagem deve possuir até 5 MB e não pode estar vazia."
         )
-
-    temporario = None
 
     try:
         arquivo.seek(0)
@@ -75,6 +69,9 @@ def salvar_imagem_produto(codigo_barra: str, arquivo) -> Path:
                 raise ValidationError(
                     "A resolução da imagem é muito grande."
                 )
+
+            # Detecta falhas de decodificação antes de persistir o produto.
+            original.load()
 
             # Corrige a orientação da imagem.
             with ImageOps.exif_transpose(original) as imagem:
@@ -95,34 +92,14 @@ def salvar_imagem_produto(codigo_barra: str, arquivo) -> Path:
                     modo = "RGB"
 
                 with imagem.convert(modo) as convertida:
-
-                    # Cria a pasta, caso ainda não exista.
-                    destino.parent.mkdir(
-                        parents=True,
-                        exist_ok=True
-                    )
-
-                    # Cria um arquivo temporário.
-                    with tempfile.NamedTemporaryFile(
-                        dir=destino.parent,
-                        prefix=f".{codigo_barra}_",
-                        suffix=".webp",
-                        delete=False
-                    ) as arquivo_temporario:
-                        temporario = Path(
-                            arquivo_temporario.name
+                    with BytesIO() as buffer:
+                        convertida.save(
+                            buffer,
+                            format="WEBP",
+                            quality=QUALIDADE_WEBP,
+                            method=6
                         )
-
-                    # Salva a imagem convertida.
-                    convertida.save(
-                        temporario,
-                        format="WEBP",
-                        quality=QUALIDADE_WEBP,
-                        method=6
-                    )
-
-                    # Substitui o arquivo anterior.
-                    os.replace(temporario, destino)
+                        return buffer.getvalue()
 
     except ValidationError:
         raise
@@ -131,11 +108,54 @@ def salvar_imagem_produto(codigo_barra: str, arquivo) -> Path:
         UnidentifiedImageError,
         Image.DecompressionBombError,
         OSError,
+        SyntaxError,
         ValueError
     ) as erro:
         raise ValidationError(
-            "Não foi possível processar ou salvar a imagem."
+            "Não foi possível processar ou converter a imagem para WebP."
         ) from erro
+
+
+def salvar_imagem_produto(
+    codigo_barra: str,
+    arquivo,
+    *,
+    imagem_preparada: bytes | None = None
+) -> Path:
+    """
+    Salva o WebP pelo código de barras, substituindo o arquivo anterior.
+
+    Sem imagem_preparada, mantém a preparação para os chamadores existentes.
+    O formulário pode fornecer seus bytes já validados para evitar reconversão.
+    """
+
+    destino = caminho_imagem_produto(codigo_barra)
+
+    if imagem_preparada is None:
+        imagem_preparada = preparar_imagem_produto(arquivo)
+
+    if not isinstance(imagem_preparada, bytes) or not imagem_preparada:
+        raise ValidationError("A imagem preparada está vazia ou é inválida.")
+
+    temporario = None
+
+    try:
+        destino.parent.mkdir(parents=True, exist_ok=True)
+
+        with tempfile.NamedTemporaryFile(
+            dir=destino.parent,
+            prefix=f".{codigo_barra}_",
+            suffix=".webp",
+            delete=False
+        ) as arquivo_temporario:
+            temporario = Path(arquivo_temporario.name)
+            arquivo_temporario.write(imagem_preparada)
+
+        # O temporário está fechado antes da substituição, inclusive no Windows.
+        os.replace(temporario, destino)
+
+    except (OSError, ValueError) as erro:
+        raise ValidationError("Não foi possível salvar a imagem.") from erro
 
     finally:
         # Remove arquivos temporários remanescentes.

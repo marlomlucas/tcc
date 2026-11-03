@@ -5,6 +5,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from .models import Produto
+from .imagens import preparar_imagem_produto
 
 
 class ProdutoAdminForm(forms.ModelForm):
@@ -30,6 +31,10 @@ class ProdutoAdminForm(forms.ModelForm):
             "preco"
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.imagem_preparada = None
+
     def clean_codigo_barra(self):
         codigo = self.cleaned_data["codigo_barra"].strip()
 
@@ -42,21 +47,13 @@ class ProdutoAdminForm(forms.ModelForm):
 
     def clean_imagem_upload(self):
         arquivo = self.cleaned_data.get("imagem_upload")
+        self.imagem_preparada = None
 
         # A imagem é opcional.
         if arquivo is None:
             return None
 
-        # Limite de 5 MB.
-        if arquivo.size > 5 * 1024 * 1024:
-            raise ValidationError(
-                "A imagem não pode ultrapassar 5 MB."
-            )
-
-        # O ImageField utiliza Pillow para validar a imagem.
-        if arquivo.image.format not in {"JPEG", "PNG", "WEBP"}:
-            raise ValidationError(
-                "Formato inválido. Utilize JPG, PNG ou WebP."
-            )
+        # Decodifica e codifica o WebP antes de o Admin persistir o produto.
+        self.imagem_preparada = preparar_imagem_produto(arquivo)
 
         return arquivo
