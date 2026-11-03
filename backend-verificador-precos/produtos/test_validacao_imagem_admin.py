@@ -91,7 +91,8 @@ class TesteValidacaoImagemAdmin(TestCase):
             return salvar_original(imagem, arquivo, format=format, **parametros)
 
         with patch.object(Image.Image, "save", new=salvar):
-            resposta = self.client.post(url, dados, HTTP_HOST="localhost")
+            with self.captureOnCommitCallbacks(execute=True):
+                resposta = self.client.post(url, dados, HTTP_HOST="localhost")
 
         self.assertEqual(resposta.status_code, 302)
         self.assertEqual(len(conversoes), 1)
@@ -330,11 +331,12 @@ class TesteValidacaoImagemAdmin(TestCase):
     def test_alterar_codigo_sem_upload_preserva_bytes(self):
         produto, caminho, estado, conteudo = self.criar_produto_com_imagem()
 
-        resposta = self.client.post(
-            reverse("admin:produtos_produto_change", args=[produto.pk]),
-            self.dados_produto(codigo_barra="96385074"),
-            HTTP_HOST="localhost",
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            resposta = self.client.post(
+                reverse("admin:produtos_produto_change", args=[produto.pk]),
+                self.dados_produto(codigo_barra="96385074"),
+                HTTP_HOST="localhost",
+            )
 
         self.assertEqual(resposta.status_code, 302)
         produto.refresh_from_db()
