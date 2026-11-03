@@ -1,4 +1,5 @@
 
+import logging
 import os
 import re
 import tempfile
@@ -10,6 +11,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from PIL import Image, ImageOps, UnidentifiedImageError
+
+
+logger = logging.getLogger(__name__)
 
 
 # Configurações de processamento.
@@ -116,23 +120,15 @@ def preparar_imagem_produto(arquivo) -> bytes:
         ) from erro
 
 
-def salvar_imagem_produto(
+def publicar_imagem_produto(
     codigo_barra: str,
-    arquivo,
-    *,
-    imagem_preparada: bytes | None = None
+    imagem_preparada: bytes
 ) -> Path:
     """
-    Salva o WebP pelo código de barras, substituindo o arquivo anterior.
-
-    Sem imagem_preparada, mantém a preparação para os chamadores existentes.
-    O formulário pode fornecer seus bytes já validados para evitar reconversão.
+    Publica bytes WebP já validados, sem decodificar ou converter novamente.
     """
 
     destino = caminho_imagem_produto(codigo_barra)
-
-    if imagem_preparada is None:
-        imagem_preparada = preparar_imagem_produto(arquivo)
 
     if not isinstance(imagem_preparada, bytes) or not imagem_preparada:
         raise ValidationError("A imagem preparada está vazia ou é inválida.")
@@ -153,6 +149,7 @@ def salvar_imagem_produto(
 
         # O temporário está fechado antes da substituição, inclusive no Windows.
         os.replace(temporario, destino)
+        temporario = None
 
     except (OSError, ValueError) as erro:
         raise ValidationError("Não foi possível salvar a imagem.") from erro
@@ -160,9 +157,36 @@ def salvar_imagem_produto(
     finally:
         # Remove arquivos temporários remanescentes.
         if temporario is not None:
-            temporario.unlink(missing_ok=True)
+            try:
+                temporario.unlink(missing_ok=True)
+            except OSError:
+                # A falha de limpeza não deve substituir o erro de publicação.
+                logger.exception(
+                    "Erro ao remover o temporário da imagem do produto %s: %s",
+                    codigo_barra,
+                    temporario
+                )
 
     return destino
+
+
+def salvar_imagem_produto(
+    codigo_barra: str,
+    arquivo,
+    *,
+    imagem_preparada: bytes | None = None
+) -> Path:
+    """
+    Mantém a chamada existente, preparando o upload somente quando necessário.
+    """
+
+    # Preserva a rejeição de códigos inválidos antes de processar o upload.
+    caminho_imagem_produto(codigo_barra)
+
+    if imagem_preparada is None:
+        imagem_preparada = preparar_imagem_produto(arquivo)
+
+    return publicar_imagem_produto(codigo_barra, imagem_preparada)
 
 
 def excluir_imagem_produto(codigo_barra: str) -> bool:

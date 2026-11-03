@@ -308,3 +308,57 @@ class TesteValidacaoImagemAdmin(TestCase):
         with Image.open(caminho) as imagem:
             imagem.load()
             self.assertEqual(imagem.format, "WEBP")
+
+    def test_edicao_sem_upload_preserva_imagem(self):
+        produto, caminho, estado, conteudo = self.criar_produto_com_imagem()
+        modificacao_anterior = caminho.stat().st_mtime_ns
+
+        resposta = self.client.post(
+            reverse("admin:produtos_produto_change", args=[produto.pk]),
+            self.dados_produto(nome="Nome alterado", preco="20.00"),
+            HTTP_HOST="localhost",
+        )
+
+        self.assertEqual(resposta.status_code, 302)
+        produto.refresh_from_db()
+        self.assertEqual(produto.nome, "Nome alterado")
+        self.assertEqual(str(produto.preco), "20.00")
+        self.assertEqual(caminho.read_bytes(), conteudo)
+        self.assertEqual(caminho.stat().st_mtime_ns, modificacao_anterior)
+        self.assertEqual(list(caminho.parent.iterdir()), [caminho])
+
+    def test_alterar_codigo_sem_upload_preserva_bytes(self):
+        produto, caminho, estado, conteudo = self.criar_produto_com_imagem()
+
+        resposta = self.client.post(
+            reverse("admin:produtos_produto_change", args=[produto.pk]),
+            self.dados_produto(codigo_barra="96385074"),
+            HTTP_HOST="localhost",
+        )
+
+        self.assertEqual(resposta.status_code, 302)
+        produto.refresh_from_db()
+        self.assertEqual(produto.codigo_barra, "96385074")
+        caminho_novo = caminho_imagem_produto(produto.codigo_barra)
+        self.assertFalse(caminho.exists())
+        self.assertEqual(caminho_novo.read_bytes(), conteudo)
+        self.assertEqual(list(caminho_novo.parent.iterdir()), [caminho_novo])
+
+    def test_alterar_codigo_com_upload_converte_uma_vez(self):
+        produto, caminho, estado, conteudo = self.criar_produto_com_imagem()
+        dados = self.dados_produto(codigo_barra="96385074")
+        dados["imagem_upload"] = self.criar_imagem(cor="blue")
+
+        self.postar_com_contagem_de_conversoes(
+            reverse("admin:produtos_produto_change", args=[produto.pk]), dados
+        )
+
+        produto.refresh_from_db()
+        self.assertEqual(produto.codigo_barra, "96385074")
+        caminho_novo = caminho_imagem_produto(produto.codigo_barra)
+        self.assertFalse(caminho.exists())
+        self.assertNotEqual(caminho_novo.read_bytes(), conteudo)
+        with Image.open(caminho_novo) as imagem:
+            imagem.load()
+            self.assertEqual(imagem.format, "WEBP")
+        self.assertEqual(list(caminho_novo.parent.iterdir()), [caminho_novo])
