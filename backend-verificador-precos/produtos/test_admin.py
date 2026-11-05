@@ -42,6 +42,7 @@ class TesteExclusaoProdutoAdmin(TestCase):
 
     def test_excluir_produto_com_imagem(self):
         produto = self.criar_produto("12345670")
+        produto_pk = produto.pk
 
         caminho = caminho_imagem_produto(
             produto.codigo_barra
@@ -57,12 +58,13 @@ class TesteExclusaoProdutoAdmin(TestCase):
             )
 
         self.assertFalse(
-            Produto.objects.filter(pk=produto.pk).exists()
+            Produto.objects.filter(pk=produto_pk).exists()
         )
         self.assertFalse(caminho.exists())
 
     def test_excluir_produto_sem_imagem(self):
         produto = self.criar_produto("12345671")
+        produto_pk = produto.pk
 
         with self.captureOnCommitCallbacks(execute=True):
             self.produto_admin.delete_model(
@@ -71,7 +73,7 @@ class TesteExclusaoProdutoAdmin(TestCase):
             )
 
         self.assertFalse(
-            Produto.objects.filter(pk=produto.pk).exists()
+            Produto.objects.filter(pk=produto_pk).exists()
         )
 
     def test_acoes_em_lote_desabilitadas(self):

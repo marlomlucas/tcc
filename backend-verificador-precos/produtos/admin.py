@@ -11,7 +11,7 @@ from .imagens import (
 
 from .models import Produto
 import logging
-from django.db import router, transaction
+from django.db import DatabaseError, router, transaction
 
 logger = logging.getLogger(__name__)
 
@@ -163,20 +163,76 @@ class ProdutoAdmin(admin.ModelAdmin):
         """
 
         codigo_barra = obj.codigo_barra
+        produto_pk = obj.pk
         using = router.db_for_write(self.model, instance=obj)
+        caminho = caminho_imagem_produto(codigo_barra)
+        imagem_original = None
+        erro_identificacao = False
+
+        # A identificação fica apenas em memória e não altera o arquivo.
+        try:
+            imagem_original = caminho.stat()
+        except FileNotFoundError:
+            pass
+        except OSError:
+            erro_identificacao = True
+            logger.exception(
+                "Erro ao identificar a imagem antes de excluir o produto %s "
+                "(código %s, arquivo %s)",
+                produto_pk, codigo_barra, caminho
+            )
 
         # Exclui o produto do banco de dados.
         super().delete_model(request, obj)
 
         # Executa a exclusão da imagem após o commit.
         def remover_imagem():
-            try:
-                excluir_imagem_produto(codigo_barra)
+            aviso = (
+                "O produto foi excluído, mas não foi possível concluir a remoção "
+                "de sua imagem. Verifique os registros e regularize o arquivo "
+                "manualmente."
+            )
 
-            except OSError:
+            if erro_identificacao:
+                self.message_user(request, aviso, level=messages.WARNING)
+                return
+
+            # Um arquivo criado posteriormente não pertence a esta exclusão.
+            if imagem_original is None:
+                return
+
+            try:
+                if Produto.objects.using(using).filter(codigo_barra=codigo_barra).exists():
+                    logger.warning(
+                        "Imagem preservada após excluir o produto %s: código %s "
+                        "reutilizado por outro produto (arquivo %s)",
+                        produto_pk, codigo_barra, caminho
+                    )
+                else:
+                    imagem_atual = caminho.stat()
+                    campos = ("st_dev", "st_ino", "st_size", "st_mtime_ns")
+                    if any(
+                        getattr(imagem_atual, campo) != getattr(imagem_original, campo)
+                        for campo in campos
+                    ):
+                        logger.warning(
+                            "Imagem preservada após excluir o produto %s: arquivo "
+                            "alterado (código %s, arquivo %s)",
+                            produto_pk, codigo_barra, caminho
+                        )
+                    else:
+                        excluir_imagem_produto(codigo_barra)
+                        return
+
+            except FileNotFoundError:
+                return
+            except (OSError, ValidationError, DatabaseError):
                 logger.exception(
-                    "Erro ao excluir a imagem do produto %s",
-                    codigo_barra
+                    "Erro ao remover a imagem após commit da exclusão do produto %s "
+                    "(código %s, arquivo %s)",
+                    produto_pk, codigo_barra, caminho
                 )
+
+            self.message_user(request, aviso, level=messages.WARNING)
 
         transaction.on_commit(remover_imagem, using=using)
