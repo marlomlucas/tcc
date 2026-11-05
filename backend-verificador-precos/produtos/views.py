@@ -2,19 +2,15 @@ from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 
 from .models import Produto
 from .serializers import ProdutoSerializer, ErroSerializer
 from .validador import codigo_barra_valido
 
 
-class ProdutoPorCodigoAPIView(RetrieveAPIView):
-    serializer_class = ProdutoSerializer
-    lookup_field = "codigo_barra"
-    queryset = Produto.objects.all()
-
-    @extend_schema(
+@extend_schema_view(
+    get=extend_schema(
         summary="Consultar produto pelo código de barras",
         description=(
             "Consulta um produto cadastrado no sistema utilizando "
@@ -36,6 +32,12 @@ class ProdutoPorCodigoAPIView(RetrieveAPIView):
         },
         tags=["Produtos"],
     )
+)
+class ProdutoPorCodigoAPIView(RetrieveAPIView):
+    serializer_class = ProdutoSerializer
+    lookup_field = "codigo_barra"
+    queryset = Produto.objects.all()
+
     def retrieve(self, request, *args, **kwargs):
 
         codigo_barra = kwargs.get("codigo_barra")

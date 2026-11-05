@@ -8,14 +8,18 @@ paths:
   /api/produtos/{codigo_barra}/:
     get:
       operationId: produtos_retrieve
+      description: Consulta um produto cadastrado no sistema utilizando o código de
+        barras informado.
+      summary: Consultar produto pelo código de barras
       parameters:
       - in: path
         name: codigo_barra
         schema:
           type: string
+        description: Código de barras utilizado para localizar o produto.
         required: true
       tags:
-      - produtos
+      - Produtos
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -27,8 +31,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/Produto'
           description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+          description: ''
 components:
   schemas:
+    Erro:
+      type: object
+      properties:
+        erro:
+          type: string
+      required:
+      - erro
     Produto:
       type: object
       properties:
@@ -52,9 +75,15 @@ components:
           format: date-time
           readOnly: true
           title: Data de Atualização
+        imagem:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
       required:
       - codigo_barra
       - data_atualizacao
+      - imagem
       - nome
       - preco
   securitySchemes:
