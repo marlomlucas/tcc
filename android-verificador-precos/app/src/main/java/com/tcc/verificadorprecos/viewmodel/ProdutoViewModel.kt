@@ -3,6 +3,9 @@ package com.tcc.verificadorprecos.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tcc.verificadorprecos.data.ProdutoDto
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +41,12 @@ class ProdutoViewModel(
     val uiState: StateFlow<ProdutoUiState> =
         _uiState.asStateFlow()
 
+    private var consultaAtiva: Job? = null
+
     fun consultarProduto(codigoBarra: String) {
+
+        consultaAtiva?.cancel()
+        consultaAtiva = null
 
         val codigo = codigoBarra.trim()
 
@@ -48,7 +56,7 @@ class ProdutoViewModel(
             return
         }
 
-        viewModelScope.launch {
+        consultaAtiva = viewModelScope.launch {
 
             _uiState.value = ProdutoUiState.Carregando
 
@@ -56,6 +64,9 @@ class ProdutoViewModel(
 
                 val response =
                     repository.consultarProduto(codigo)
+
+                // Ignora retornos antigos mesmo se o repository não cooperar com o cancelamento.
+                ensureActive()
 
                 if (response.isSuccessful) {
 
@@ -89,8 +100,13 @@ class ProdutoViewModel(
                         ProdutoUiState.Erro(mensagem)
                 }
 
+            } catch (e: CancellationException) {
+
+                throw e
+
             } catch (e: IOException) {
 
+                ensureActive()
                 _uiState.value =
                     ProdutoUiState.Erro(
                         "Não foi possível conectar ao servidor."
@@ -98,6 +114,7 @@ class ProdutoViewModel(
 
             } catch (e: Exception) {
 
+                ensureActive()
                 _uiState.value =
                     ProdutoUiState.Erro(
                         "Ocorreu um erro durante a consulta."
@@ -107,6 +124,8 @@ class ProdutoViewModel(
     }
 
     fun limpar() {
+        consultaAtiva?.cancel()
+        consultaAtiva = null
         _uiState.value = ProdutoUiState.Inicial
     }
 }
