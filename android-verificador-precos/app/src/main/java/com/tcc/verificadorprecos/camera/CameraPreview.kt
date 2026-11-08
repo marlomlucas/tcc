@@ -65,94 +65,70 @@ fun CameraPreview(
         }
     }
 
-    val cameraExecutor = remember {
-        Executors.newSingleThreadExecutor()
-    }
-
-    val barcodeAnalyzer = remember {
-
-        BarcodeAnalyzer { codigo ->
-
-            callbackAtual.value(codigo)
-        }
-    }
-
-    DisposableEffect(Unit) {
-
-        onDispose {
-
-            barcodeAnalyzer.fechar()
-            cameraExecutor.shutdown()
-        }
-    }
-
     if (permissaoConcedida) {
+
+        val previewView = remember(context) {
+            PreviewView(context).apply {
+                scaleType = PreviewView.ScaleType.FILL_CENTER
+            }
+        }
 
         AndroidView(
             modifier = modifier,
+            factory = { previewView }
+        )
 
-            factory = { ctx ->
+        DisposableEffect(previewView, lifecycleOwner) {
+            // O listener e o descarte desta sessão executam na thread principal.
+            var ativa = true
+            var cameraProvider: ProcessCameraProvider? = null
+            val cameraExecutor = Executors.newSingleThreadExecutor()
+            val barcodeAnalyzer = BarcodeAnalyzer { codigo ->
+                if (ativa) {
+                    callbackAtual.value(codigo)
+                }
+            }
+            val preview = Preview.Builder().build().also {
+                it.surfaceProvider = previewView.surfaceProvider
+            }
+            val imageAnalysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+            imageAnalysis.setAnalyzer(cameraExecutor, barcodeAnalyzer)
 
-                val previewView = PreviewView(ctx)
-
-                previewView.scaleType =
-                    PreviewView.ScaleType.FILL_CENTER
-
-                val cameraProviderFuture =
-                    ProcessCameraProvider.getInstance(ctx)
-
-                cameraProviderFuture.addListener({
-
+            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+            cameraProviderFuture.addListener({
+                // Uma inicialização antiga não pode vincular outra sessão.
+                if (ativa) {
                     try {
-
-                        val cameraProvider =
-                            cameraProviderFuture.get()
-
-                        val preview =
-                            Preview.Builder()
-                                .build()
-
-                        preview.surfaceProvider =
-                            previewView.surfaceProvider
-
-                        val imageAnalysis =
-                            ImageAnalysis.Builder()
-                                .setBackpressureStrategy(
-                                    ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
-                                )
-                                .build()
-
-                        imageAnalysis.setAnalyzer(
-                            cameraExecutor,
-                            barcodeAnalyzer
-                        )
-
-                        val cameraSelector =
-                            CameraSelector.DEFAULT_BACK_CAMERA
-
-                        cameraProvider.unbindAll()
-
-                        cameraProvider.bindToLifecycle(
+                        val provider = cameraProviderFuture.get()
+                        cameraProvider = provider
+                        provider.bindToLifecycle(
                             lifecycleOwner,
-                            cameraSelector,
+                            CameraSelector.DEFAULT_BACK_CAMERA,
                             preview,
                             imageAnalysis
                         )
-
                     } catch (e: Exception) {
-
-                        Log.e(
-                            "CameraPreview",
-                            "Erro ao iniciar câmera",
-                            e
-                        )
+                        Log.e("CameraPreview", "Erro ao iniciar câmera", e)
                     }
+                }
+            }, ContextCompat.getMainExecutor(context))
 
-                }, ContextCompat.getMainExecutor(ctx))
-
-                previewView
+            onDispose {
+                ativa = false
+                try {
+                    imageAnalysis.clearAnalyzer()
+                    cameraProvider?.unbind(preview, imageAnalysis)
+                } finally {
+                    try {
+                        barcodeAnalyzer.fechar()
+                    } finally {
+                        cameraExecutor.shutdown()
+                    }
+                }
             }
-        )
+        }
 
     } else {
 
