@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tcc.verificadorprecos.ui.TelaDescobertaServidor
 import com.tcc.verificadorprecos.ui.TelaLeitura
 import com.tcc.verificadorprecos.ui.TelaResultado
 import com.tcc.verificadorprecos.ui.theme.VerificadorPrecosTheme
@@ -58,10 +59,22 @@ fun TelaVerificadorPrecos(
         mutableStateOf(true)
     }
 
+    var mostrarDiagnostico by remember {
+        mutableStateOf(false)
+    }
+
     val uiState by produtoViewModel.uiState.collectAsState()
 
     val teclado = LocalSoftwareKeyboardController.current
     val gerenciadorFoco = LocalFocusManager.current
+
+    if (mostrarDiagnostico) {
+        TelaDescobertaServidor(
+            onVoltar = { mostrarDiagnostico = false },
+            modifier = Modifier.fillMaxSize()
+        )
+        return
+    }
 
     // Quando encontrar um produto, mostra a tela de resultado.
     if (uiState is ProdutoUiState.Sucesso) {
@@ -92,7 +105,7 @@ fun TelaVerificadorPrecos(
 
         onCodigoDetectado = { codigo ->
 
-            if (leituraAtiva) {
+            if (leituraAtiva && !mostrarDiagnostico) {
 
                 leituraAtiva = false
                 codigoBarra = codigo
@@ -118,6 +131,12 @@ fun TelaVerificadorPrecos(
             codigoBarra = ""
             produtoViewModel.limpar()
             leituraAtiva = true
+        },
+
+        onProcurarServidor = {
+            gerenciadorFoco.clearFocus()
+            teclado?.hide()
+            mostrarDiagnostico = true
         },
 
         modifier = Modifier.fillMaxSize()

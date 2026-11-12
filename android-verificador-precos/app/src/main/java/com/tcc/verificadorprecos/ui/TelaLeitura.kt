@@ -39,7 +39,8 @@ fun TelaLeitura(
     onCodigoDetectado: (String) -> Unit,
     onConsultar: () -> Unit,
     onNovaLeitura: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onProcurarServidor: () -> Unit = {}
 ) {
 
     Column(
@@ -55,6 +56,14 @@ fun TelaLeitura(
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
+
+        OutlinedButton(
+            onClick = onProcurarServidor,
+            enabled = uiState == ProdutoUiState.Inicial,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Procurar servidor")
+        }
 
         Text(
             text = "Aponte a câmera para o código de barras",

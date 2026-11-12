@@ -5,6 +5,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!--- permissão para o aplicativo abrir conexões de rede. -->
 
+    <!-- Mantida somente durante a descoberta, inclusive no Android 12. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+
+    <!-- Solicitada em tempo de execução apenas no Android 17 ou superior. -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <!--- permissão para o aplicativo abrir camera. -->
 
