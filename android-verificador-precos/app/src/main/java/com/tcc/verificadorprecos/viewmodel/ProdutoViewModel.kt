@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 import com.tcc.verificadorprecos.repository.ProdutoRepository
-import com.tcc.verificadorprecos.repository.ProdutoRepositoryImpl
+import com.tcc.verificadorprecos.connection.SessaoServidor
 
 sealed interface ProdutoUiState {
 
@@ -30,10 +30,9 @@ sealed interface ProdutoUiState {
 }
 
 class ProdutoViewModel(
-    private val repository: ProdutoRepository
+    private val repository: ProdutoRepository,
+    private val servidor: StateFlow<SessaoServidor?>? = null
 ) : ViewModel() {
-
-    constructor() : this(ProdutoRepositoryImpl())
 
     private val _uiState =
         MutableStateFlow<ProdutoUiState>(ProdutoUiState.Inicial)
@@ -42,6 +41,20 @@ class ProdutoViewModel(
         _uiState.asStateFlow()
 
     private var consultaAtiva: Job? = null
+
+    init {
+        servidor?.let { origem ->
+            var anterior = origem.value
+            viewModelScope.launch {
+                origem.collect { atual ->
+                    if (atual != anterior) {
+                        anterior = atual
+                        limpar()
+                    }
+                }
+            }
+        }
+    }
 
     fun consultarProduto(codigoBarra: String) {
 
@@ -56,6 +69,12 @@ class ProdutoViewModel(
             return
         }
 
+        val sessaoInicial = servidor?.value
+        if (servidor != null && sessaoInicial == null) {
+            _uiState.value = ProdutoUiState.Erro("Conecte ao servidor antes de consultar produtos.")
+            return
+        }
+
         consultaAtiva = viewModelScope.launch {
 
             _uiState.value = ProdutoUiState.Carregando
@@ -67,6 +86,7 @@ class ProdutoViewModel(
 
                 // Ignora retornos antigos mesmo se o repository não cooperar com o cancelamento.
                 ensureActive()
+                if (servidor != null && servidor.value != sessaoInicial) return@launch
 
                 if (response.isSuccessful) {
 
@@ -107,6 +127,7 @@ class ProdutoViewModel(
             } catch (e: IOException) {
 
                 ensureActive()
+                if (servidor != null && servidor.value != sessaoInicial) return@launch
                 _uiState.value =
                     ProdutoUiState.Erro(
                         "Não foi possível conectar ao servidor."
@@ -115,6 +136,7 @@ class ProdutoViewModel(
             } catch (e: Exception) {
 
                 ensureActive()
+                if (servidor != null && servidor.value != sessaoInicial) return@launch
                 _uiState.value =
                     ProdutoUiState.Erro(
                         "Ocorreu um erro durante a consulta."

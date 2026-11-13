@@ -18,11 +18,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"http://192.168.100.10:8000/\""
-        )
     }
 
     buildTypes {
@@ -38,7 +33,6 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true // Permite gerar a classe BuildConfig. usada para guardar a URL da API fora do código Kotlin principal.
     }
 }
 

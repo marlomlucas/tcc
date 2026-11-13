@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,7 @@ fun TelaLeitura(
     onConsultar: () -> Unit,
     onNovaLeitura: () -> Unit,
     modifier: Modifier = Modifier,
-    onProcurarServidor: () -> Unit = {}
+    leituraHabilitada: Boolean = true
 ) {
 
     Column(
@@ -56,14 +57,6 @@ fun TelaLeitura(
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
-
-        OutlinedButton(
-            onClick = onProcurarServidor,
-            enabled = uiState == ProdutoUiState.Inicial,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Procurar servidor")
-        }
 
         Text(
             text = "Aponte a câmera para o código de barras",
@@ -84,7 +77,7 @@ fun TelaLeitura(
                 contentAlignment = Alignment.Center
             ) {
 
-                if (uiState == ProdutoUiState.Inicial) {
+                if (leituraHabilitada && uiState == ProdutoUiState.Inicial && !LocalInspectionMode.current) {
 
                     // Câmera ativa somente no estado inicial
                     CameraPreview(
@@ -157,13 +150,13 @@ fun TelaLeitura(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
-            enabled = uiState !is ProdutoUiState.Carregando,
+            enabled = leituraHabilitada && uiState !is ProdutoUiState.Carregando,
             modifier = Modifier.fillMaxWidth()
         )
 
         Button(
             onClick = onConsultar,
-            enabled = uiState !is ProdutoUiState.Carregando,
+            enabled = leituraHabilitada && uiState !is ProdutoUiState.Carregando,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Consultar manualmente")

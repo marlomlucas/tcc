@@ -1,41 +1,26 @@
 @echo off
+setlocal
 title Verificador de Precos
 
 cd /d "%~dp0"
 
-echo ==========================================
-echo      BACKEND - VERIFICADOR DE PRECOS
-echo ==========================================
-echo.
-echo 1 - Servidor LOCAL
-echo 2 - Servidor na REDE
-echo.
+if not exist ".venv\Scripts\python.exe" (
+    echo ERRO: Python do ambiente virtual nao encontrado.
+    echo Confira a pasta .venv deste projeto.
+    pause
+    exit /b 1
+)
 
-set /p opcao=Escolha uma opcao: 
+if not exist "iniciar_servidor.py" (
+    echo ERRO: O arquivo iniciar_servidor.py nao foi encontrado.
+    pause
+    exit /b 1
+)
 
-if "%opcao%"=="1" goto local
-if "%opcao%"=="2" goto rede
+".venv\Scripts\python.exe" -B iniciar_servidor.py
+if not errorlevel 1 exit /b 0
 
 echo.
-echo Opcao invalida.
+echo Nao foi possivel concluir a inicializacao. Confira a mensagem acima.
 pause
-exit /b
-
-:local
-echo.
-echo Iniciando servidor local...
-echo Endereco: http://127.0.0.1:8000/
-echo.
-".venv\Scripts\python.exe" manage.py runserver
-goto fim
-
-:rede
-echo.
-echo Iniciando servidor para acesso pela rede...
-echo Porta: 8000
-echo.
-".venv\Scripts\python.exe" manage.py runserver 0.0.0.0:8000
-goto fim
-
-:fim
-pause
+exit /b 1

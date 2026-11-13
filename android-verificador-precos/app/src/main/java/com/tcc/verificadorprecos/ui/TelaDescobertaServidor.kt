@@ -1,11 +1,6 @@
 package com.tcc.verificadorprecos.ui
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,128 +8,61 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.tcc.verificadorprecos.discovery.DescobertaNsdAndroid
-import com.tcc.verificadorprecos.discovery.DescobertaServidorViewModel
-import com.tcc.verificadorprecos.discovery.FaseDescoberta
+import com.tcc.verificadorprecos.connection.EstadoConexao
+import com.tcc.verificadorprecos.connection.FaseConexao
+import com.tcc.verificadorprecos.connection.ModoConexao
+import com.tcc.verificadorprecos.connection.OpcaoServidor
 
 @Composable
 fun TelaDescobertaServidor(
-    onVoltar: () -> Unit,
-    modifier: Modifier = Modifier
+    estado: EstadoConexao,
+    onProcurarNovamente: () -> Unit,
+    onUsarAutomatico: () -> Unit,
+    onConectarManual: (String, String) -> Unit,
+    onSelecionar: (OpcaoServidor) -> Unit,
+    onReconectar: () -> Unit,
+    modifier: Modifier = Modifier,
+    permissaoConcedida: Boolean = true,
+    solicitandoPermissao: Boolean = false,
+    onVoltar: (() -> Unit)? = null
 ) {
-    val contexto = LocalContext.current.applicationContext
-    val donoCicloDeVida = LocalLifecycleOwner.current
-    val fabrica = remember(contexto) {
-        viewModelFactory {
-            initializer { DescobertaServidorViewModel(DescobertaNsdAndroid(contexto)) }
-        }
-    }
-    val descoberta: DescobertaServidorViewModel = viewModel(factory = fabrica)
-    val estado by descoberta.estado.collectAsStateWithLifecycle()
-    var telaAtiva by remember { mutableStateOf(true) }
-    var solicitandoPermissao by remember { mutableStateOf(false) }
-    var buscarAposPermissao by remember { mutableStateOf(false) }
+    var mostrarManual by rememberSaveable { mutableStateOf(estado.modo == ModoConexao.MANUAL) }
+    var entradaManual by rememberSaveable { mutableStateOf(estado.manualSalvo.orEmpty()) }
+    var portaManual by rememberSaveable { mutableStateOf("") }
 
-    fun temPermissao(): Boolean = Build.VERSION.SDK_INT < 37 ||
-        ContextCompat.checkSelfPermission(contexto, Manifest.permission.ACCESS_LOCAL_NETWORK) ==
-        PackageManager.PERMISSION_GRANTED
-
-    var tinhaPermissao by remember { mutableStateOf(temPermissao()) }
-
-    fun informarPermissaoNegada() {
-        buscarAposPermissao = false
-        descoberta.parar()
-        descoberta.informarErro(
-            "Permissão de rede local não concedida. Autorize o acesso para procurar servidores."
-        )
+    LaunchedEffect(estado.manualSalvo) {
+        if (entradaManual.isBlank()) entradaManual = estado.manualSalvo.orEmpty()
     }
 
-    val solicitarPermissao = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { concedida ->
-        solicitandoPermissao = false
-        tinhaPermissao = temPermissao()
-        if (telaAtiva && buscarAposPermissao) {
-            if (!concedida || !temPermissao()) {
-                informarPermissaoNegada()
-            } else if (donoCicloDeVida.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                buscarAposPermissao = false
-                descoberta.iniciar()
-            }
-            // Se o resultado anteceder ON_RESUME, o observador conclui o pedido do usuário.
-        }
-    }
+    if (onVoltar != null) BackHandler(onBack = onVoltar)
 
-    DisposableEffect(donoCicloDeVida, descoberta) {
-        telaAtiva = true
-        val observador = LifecycleEventObserver { _, evento ->
-            when (evento) {
-                Lifecycle.Event.ON_STOP -> {
-                    buscarAposPermissao = false
-                    descoberta.parar()
-                }
-                Lifecycle.Event.ON_RESUME -> {
-                    val permitida = temPermissao()
-                    if (!permitida) {
-                        if (tinhaPermissao || descoberta.estado.value.buscando) informarPermissaoNegada()
-                    } else if (telaAtiva && buscarAposPermissao && !solicitandoPermissao) {
-                        buscarAposPermissao = false
-                        descoberta.iniciar()
-                    }
-                    tinhaPermissao = permitida
-                }
-                else -> Unit
-            }
-        }
-        donoCicloDeVida.lifecycle.addObserver(observador)
-        onDispose {
-            telaAtiva = false
-            buscarAposPermissao = false
-            donoCicloDeVida.lifecycle.removeObserver(observador)
-            descoberta.parar()
-        }
-    }
-
-    val sair = {
-        telaAtiva = false
-        buscarAposPermissao = false
-        descoberta.parar()
-        onVoltar()
-    }
-    BackHandler(onBack = sair)
-
+    val ocupado = estado.fase == FaseConexao.PROCURANDO || estado.fase == FaseConexao.VERIFICANDO
     val fase = when (estado.fase) {
-        FaseDescoberta.AGUARDANDO -> "Aguardando busca"
-        FaseDescoberta.PROCURANDO -> "Procurando servidor"
-        FaseDescoberta.RESOLVENDO -> "Resolvendo endereço do serviço"
-        FaseDescoberta.VALIDANDO -> "Validando a identificação do serviço"
-        FaseDescoberta.ENCONTRADO -> "Servidor encontrado"
-        FaseDescoberta.SEM_RESULTADOS -> "Nenhum servidor encontrado"
-        FaseDescoberta.ERRO -> "Erro na descoberta"
+        FaseConexao.AGUARDANDO -> "Preparando conexão"
+        FaseConexao.PROCURANDO -> "Procurando servidor na rede local"
+        FaseConexao.ESCOLHER_SERVIDOR -> "Escolha um servidor"
+        FaseConexao.VERIFICANDO -> "Verificando conexão com o servidor"
+        FaseConexao.CONECTADO -> "Servidor conectado"
+        FaseConexao.INDISPONIVEL -> "Servidor indisponível"
+        FaseConexao.ERRO -> "Não foi possível conectar"
     }
 
     Column(
@@ -145,72 +73,140 @@ fun TelaDescobertaServidor(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Descoberta de servidor", style = MaterialTheme.typography.headlineSmall)
-        Text("A busca apenas apresenta os servidores encontrados na rede local.")
-        Text("Estado: $fase", style = MaterialTheme.typography.titleMedium)
-        if (estado.buscando) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        Text("Conexão com o servidor", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            "Conecte ao servidor de preços para liberar a câmera e a consulta manual.",
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(fase, style = MaterialTheme.typography.titleMedium)
+        if (ocupado) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         if (solicitandoPermissao) Text("Aguardando autorização de rede local...")
-        estado.mensagem?.let { Text(it) }
+        if (!permissaoConcedida && !solicitandoPermissao) {
+            Text("Autorize o acesso à rede local para conectar ao servidor.")
+        }
+        estado.mensagem?.let { mensagem ->
+            Text(
+                mensagem,
+                color = if (estado.fase == FaseConexao.ERRO ||
+                    estado.fase == FaseConexao.INDISPONIVEL
+                ) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Text(
+            if (estado.modo == ModoConexao.MANUAL) "Modo: servidor manual" else "Modo: automático",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        estado.sessao?.let { sessao ->
+            Text("Servidor ativo: ${sessao.endereco.urlBase}")
+        }
+        estado.manualSalvo?.let { salvo ->
+            Text("Servidor manual salvo: $salvo", style = MaterialTheme.typography.bodySmall)
+        }
 
         Button(
-            enabled = !estado.buscando && !solicitandoPermissao,
-            modifier = Modifier.fillMaxWidth(),
             onClick = {
-                if (telaAtiva &&
-                    donoCicloDeVida.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-                ) {
-                    if (temPermissao()) {
-                        tinhaPermissao = true
-                        descoberta.iniciar()
-                    } else if (Build.VERSION.SDK_INT >= 37) {
-                        buscarAposPermissao = true
-                        solicitandoPermissao = true
-                        solicitarPermissao.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
+                if (estado.modo == ModoConexao.MANUAL && estado.manualSalvo == null) {
+                    mostrarManual = true
+                    if (!permissaoConcedida) onReconectar()
+                } else if (estado.modo == ModoConexao.MANUAL) {
+                    onReconectar()
+                } else {
+                    onProcurarNovamente()
+                }
+            },
+            enabled = !ocupado && !solicitandoPermissao,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                when {
+                    !permissaoConcedida -> "Autorizar acesso à rede local"
+                    estado.modo == ModoConexao.MANUAL && estado.manualSalvo == null -> "Configurar servidor"
+                    estado.modo == ModoConexao.MANUAL -> "Reconectar ao servidor salvo"
+                    else -> "Procurar novamente"
+                }
+            )
+        }
+
+        if (estado.candidatos.isNotEmpty()) {
+            Text("Servidores encontrados", style = MaterialTheme.typography.titleMedium)
+            if (estado.candidatos.size > 1) {
+                Text("Selecione o servidor que deseja utilizar.")
+            }
+            estado.candidatos.forEach { candidato ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(candidato.nome, style = MaterialTheme.typography.titleMedium)
+                        Text(candidato.endereco.urlBase)
+                        Button(
+                            onClick = { onSelecionar(candidato) },
+                            enabled = !ocupado && !solicitandoPermissao,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Conectar a este servidor")
+                        }
                     }
                 }
             }
-        ) {
-            Text(if (estado.fase == FaseDescoberta.AGUARDANDO) "Procurar servidor" else "Procurar novamente")
         }
 
-        if (estado.buscando) {
-            OutlinedButton(
-                onClick = {
-                    buscarAposPermissao = false
-                    descoberta.parar()
-                },
+        OutlinedButton(
+            onClick = onUsarAutomatico,
+            enabled = !solicitandoPermissao,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Usar modo automático")
+        }
+        if (estado.manualSalvo != null) {
+            Text(
+                "Ao usar o modo automático, o endereço manual salvo será removido.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        OutlinedButton(
+            onClick = { mostrarManual = !mostrarManual },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (mostrarManual) "Ocultar configuração manual" else "Configurar servidor manualmente")
+        }
+        if (mostrarManual) {
+            OutlinedTextField(
+                value = entradaManual,
+                onValueChange = { entradaManual = it },
+                label = { Text("IPv4 ou URL do servidor") },
+                placeholder = { Text("192.168.1.10 ou http://192.168.1.10:8000/") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = portaManual,
+                onValueChange = { portaManual = it },
+                label = { Text("Porta (opcional)") },
+                placeholder = { Text("8000") },
+                supportingText = { Text("Deixe em branco para usar a porta da URL ou a porta padrão.") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Button(
+                onClick = { onConectarManual(entradaManual, portaManual) },
+                enabled = !solicitandoPermissao,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Parar busca")
+                Text("Testar e conectar")
             }
         }
 
-        if (estado.servidores.size > 1) {
-            Text("Mais de um servidor compatível foi encontrado. Nenhum foi selecionado.")
-        }
-        if (!estado.buscando && estado.servidores.isNotEmpty()) {
-            Text("Resultados da última busca; inicie outra busca para conferir alterações.")
-        }
-        estado.servidores.forEach { servidor ->
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(servidor.nome, style = MaterialTheme.typography.titleMedium)
-                    Text("IPv4: ${servidor.enderecosIpv4.joinToString()}")
-                    Text("Porta: ${servidor.porta}")
-                    Text("TXT app: verificador-precos")
-                    Text("Versão: ${servidor.versao}")
-                    Text("Identificação app e versão validadas.")
-                }
+        if (onVoltar != null) {
+            OutlinedButton(onClick = onVoltar, modifier = Modifier.fillMaxWidth()) {
+                Text("Voltar à leitura")
             }
-        }
-        estado.avisos.forEach { aviso ->
-            Text(aviso, color = MaterialTheme.colorScheme.error)
-        }
-        OutlinedButton(onClick = sair, modifier = Modifier.fillMaxWidth()) {
-            Text("Voltar à leitura")
         }
     }
 }
