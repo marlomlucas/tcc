@@ -11,8 +11,5 @@
 __pycache__/
 *.pyc
 
-# Imagens e outros arquivos enviados ao sistema
-media/
-
 # Arquivos de log
 *.log
