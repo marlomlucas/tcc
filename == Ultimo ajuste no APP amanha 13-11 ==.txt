@@ -1,0 +1,2 @@
+Ultimo ajuste no APP
+ideia de hj mDNS (Multicast DNS ou DNS Multicast) e termino de documentação de instalação.
