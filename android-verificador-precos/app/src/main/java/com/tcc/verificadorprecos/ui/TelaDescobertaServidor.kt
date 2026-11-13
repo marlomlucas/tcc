@@ -30,6 +30,7 @@ import com.tcc.verificadorprecos.connection.EstadoConexao
 import com.tcc.verificadorprecos.connection.FaseConexao
 import com.tcc.verificadorprecos.connection.ModoConexao
 import com.tcc.verificadorprecos.connection.OpcaoServidor
+import com.tcc.verificadorprecos.ui.components.AssinaturaATL
 
 @Composable
 fun TelaDescobertaServidor(
@@ -208,5 +209,7 @@ fun TelaDescobertaServidor(
                 Text("Voltar à leitura")
             }
         }
+
+        AssinaturaATL()
     }
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.tcc.verificadorprecos.camera.CameraPreview
+import com.tcc.verificadorprecos.ui.components.AssinaturaATL
 import com.tcc.verificadorprecos.viewmodel.ProdutoUiState
 
 @Composable
@@ -201,5 +202,7 @@ fun TelaLeitura(
 
             is ProdutoUiState.Sucesso -> Unit
         }
+
+        AssinaturaATL()
     }
 }

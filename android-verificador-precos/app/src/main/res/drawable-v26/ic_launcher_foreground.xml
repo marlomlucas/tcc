@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mantem a arte completa no centro; a mascara do launcher define o contorno. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:inset="16.666667%">
+    <bitmap
+        android:src="@drawable/etiqueta_de_preco_verificada"
+        android:antialias="true"
+        android:filter="true"
+        android:gravity="fill" />
+</inset>

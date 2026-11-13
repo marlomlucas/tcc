@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Variante simplificada para icones tematicos: etiqueta, codigo de barras e lupa. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.74"
+        android:scaleY="0.74">
+        <group>
+            <clip-path
+                android:fillType="evenOdd"
+                android:pathData="M0,0H108V108H0Z M82,66A16,16 0,1 0,50,66A16,16 0,1 0,82,66Z" />
+            <path
+                android:fillColor="#FFFFFF"
+                android:fillType="evenOdd"
+                android:pathData="M24,51L54,23Q57,20 60,23L77,39Q80,42 77,46L50,77Q47,80 43,77L22,58Q19,55 24,51Z M68,34A4,4 0,1 0,60,34A4,4 0,1 0,68,34Z M32,48H35V63H32Z M39,48H42V63H39Z M46,48H49V63H46Z M53,48H56V63H53Z M60,48H63V63H60Z" />
+        </group>
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M80,66A14,14 0,1 0,52,66A14,14 0,1 0,80,66Z M77,66A11,11 0,1 0,55,66A11,11 0,1 0,77,66Z M74,77L81,84Q83,86 85,84Q87,82 85,80L78,73Z" />
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="1.6"
+            android:strokeLineCap="round"
+            android:pathData="M69,61C63,58 60,64 66,66C72,68 69,73 63,71 M66,59V73" />
+    </group>
+</vector>

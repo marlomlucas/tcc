@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tcc.verificadorprecos.data.ProdutoDto
+import com.tcc.verificadorprecos.ui.components.AssinaturaATL
 import com.tcc.verificadorprecos.formatarPreco
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -191,5 +192,7 @@ fun TelaResultado(
         ) {
             Text("Nova leitura")
         }
+
+        AssinaturaATL()
     }
 }
