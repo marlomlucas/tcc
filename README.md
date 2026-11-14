@@ -21,7 +21,7 @@ O aplicativo permite ler o código de barras pela câmera ou informá-lo manualm
 
 ## Instalação e execução
 
-As instruções para preparar o Windows, configurar o MySQL, instalar as dependências, executar o Django e instalar o aplicativo Android estão no [Manual de Instalação](Docs/MANUAL_INSTALACAO_Verificador_de_Precos.docx).
+As instruções para preparar o Windows, configurar o MySQL, instalar as dependências, executar o Django e instalar o aplicativo Android estão no [Manual de Instalação](Docs/MANUAL_INSTALACAO_Verificador_de_Precos.pdf).
 
 Para realizar as consultas pelo celular, o computador que executa o backend e o dispositivo Android devem estar conectados à mesma rede local, com comunicação permitida entre eles.
 
