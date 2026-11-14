@@ -7,13 +7,14 @@ Local = python manage.py runserver
 Rede = python manage.py runserver 0.0.0.0:8000
 
 
-=== Executar_BancoSQL ===
+=== Verificar e Executar BancoSQL ===
 Executar -> services.msc
 Procure -> MySQL80
 
 
 http://127.0.0.1:8000/admin/
 http://127.0.0.1:8000/api/produtos/7896079431158/
+
+Login e senha utilizado nos testes:
 admin
-admin@atl.com
 123@@Aa123
