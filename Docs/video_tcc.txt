@@ -1,0 +1,167 @@
+### SLIDE 1 — Apresentação
+
+Olá, meu nome é Marlom Camaran Lucas, sou acadêmico de Engenharia de Software da UniCesumar.
+
+Meu TCC é o desenvolvimento e a validação de um aplicativo Android para consulta de preços.
+
+A ideia é utilizar a câmera do celular para ler o código de barras e consultar as informações do produto em um servidor.
+
+### SLIDE 2 — Motivação
+
+A ideia surgiu de um problema comum no comércio: preços que faltam ou que estão incorretos e acabam causando confusão.
+
+Também existem estabelecimentos onde os verificadores de preços ficam longe ou são poucos.
+
+A Lei nº 10.962, de 2004, regulamenta a informação dos preços aos consumidores, e o descumprimento das regras pode gerar multas.
+
+Então pensei em criar uma forma de consultar os preços diretamente pelo celular.
+
+### SLIDE 3 — Objetivos
+
+O objetivo principal foi desenvolver e testar um aplicativo Android capaz de consultar produtos pelo código de barras.
+
+Primeiro, pesquisei os requisitos e se seria possível fazer o projeto funcionar.
+
+Depois, estudei sobre APIs, consultas ao banco de dados, funcionamento dos códigos de barras e ferramentas para leitura pela câmera.
+
+Também pesquisei sobre testes de software, para aplicar durante o desenvolvimento.
+
+### SLIDE 4 — Kanban e Trello
+
+**[MOSTRAR PRINT DO TRELLO]**
+
+Para organizar as tarefas, utilizei o Kanban com o Trello.
+
+Adicionei os cartões iniciais e fui criando novos conforme as ideias e necessidades iam surgindo.
+
+Assim, consegui acompanhar o que estava pendente, em andamento e concluído.
+
+### SLIDE 5 — Tecnologias utilizadas
+
+Para o Android, escolhi Kotlin porque achei mais simples e por ser recomendada pelo Google.
+
+Utilizei o Jetpack Compose para criar as telas do aplicativo.
+
+O CameraX basicamente facilita o uso da câmera.
+
+E o ML Kit foi uma das ferramentas que mais achei interessantes, porque utiliza recursos de inteligência artificial para reconhecer imagens. No projeto, ele faz a leitura dos códigos de barras.
+
+O MVVM foi utilizado para organizar o código, separando a interface da lógica.
+
+O Retrofit faz a comunicação com o backend por HTTP.
+
+O Moshi converte os dados JSON recebidos da API em objetos Kotlin.
+
+E o Coil carrega as imagens dos produtos.
+
+No backend, utilizei Python com Django e Django REST Framework, e o MySQL para armazenar os produtos.
+
+Também utilizei Git e GitHub para controlar as versões do projeto.
+
+### SLIDE 6 — Arquitetura do sistema
+
+**[MOSTRAR O DIAGRAMA]**
+
+Aqui podemos ver como o sistema funciona.
+
+Primeiro, o aplicativo localiza o servidor na rede Wi-Fi.
+
+O CameraX fornece as imagens da câmera e o ML Kit identifica o código de barras.
+
+Depois, o Retrofit envia esse código para a API Django.
+
+O Django consulta o banco MySQL e retorna as informações em JSON.
+
+Por fim, o aplicativo mostra o nome, a descrição, o preço e a imagem do produto.
+
+### SLIDE 7 — Demonstração do backend
+
+**[MOSTRAR O SERVIDOR NO COMPUTADOR]**
+
+Agora vou mostrar a parte do servidor.
+
+Aqui eu inicio o Django e podemos ver que o servidor está funcionando.
+
+**[ABRIR DJANGO ADMIN]**
+
+Pelo painel de administração, consigo cadastrar e atualizar os produtos.
+
+**[ABRIR API / SWAGGER]**
+
+Aqui podemos fazer uma consulta pelo código de barras.
+
+A API busca o produto no banco de dados e retorna as informações em formato JSON.
+
+### SLIDE 8 — Descoberta automática do servidor
+
+**[MOSTRAR A TELA DO CELULAR]**
+
+Uma melhoria que adicionei foi a descoberta automática do servidor.
+
+Utilizei o mDNS para que o aplicativo encontre o servidor quando os dois estão na mesma rede local.
+
+Assim, não é necessário informar o endereço IP manualmente.
+
+Mas também deixei a configuração manual como alternativa.
+
+### SLIDE 9 — Demonstração do aplicativo
+
+**[MOSTRAR A GRAVAÇÃO REAL DO CELULAR]**
+
+Agora vou mostrar o aplicativo funcionando.
+
+Aqui eu abro a câmera e aponto para o código de barras de um produto.
+
+O ML Kit reconhece o código, e o aplicativo faz a consulta na API.
+
+Quando encontra o produto, mostra o nome, a descrição, o preço e a imagem na tela.
+
+Também é possível fazer a consulta digitando o código manualmente.
+
+### SLIDE 10 — Tratamento de erros
+
+**[MOSTRAR OS EXEMPLOS NO APLICATIVO]**
+
+Também implementei o tratamento de erros para evitar que o aplicativo apresente informações incorretas.
+
+Quando encontra o produto, a API retorna o código HTTP 200.
+
+Se o código informado for inválido, retorna 400.
+
+E se o produto não estiver cadastrado, retorna 404.
+
+O aplicativo mostra uma mensagem correspondente a cada situação.
+
+### SLIDE 11 — Resultados e testes
+
+Para verificar o funcionamento, realizei testes no backend, no Android e na integração entre os dois.
+
+No artigo entregue, foram documentados 153 testes e cenários executados, todos aprovados.
+
+Foram 115 testes no backend, 25 testes unitários no Android e 13 cenários de integração.
+
+Depois da entrega do artigo, continuei melhorando o projeto.
+
+Adicionei a descoberta automática do servidor, ampliei os testes e também verifiquei o funcionamento em diferentes celulares.
+
+### SLIDE 12 — Melhorias futuras
+
+Apesar de o aplicativo já estar funcionando, ainda existem algumas melhorias que podem ser feitas.
+
+Uma delas seria adicionar a leitura de QR Codes.
+
+Outra seria implementar recursos para controle de estoque e relatórios.
+
+Também seria possível adaptar o sistema para utilização comercial, com mais segurança e uma infraestrutura adequada.
+
+Essas são possibilidades para continuar o desenvolvimento futuramente.
+
+### SLIDE 13 — Conclusão
+
+Com o projeto, consegui atingir o objetivo de desenvolver um aplicativo Android funcional, integrado a uma API REST e a um banco de dados.
+
+Também consegui aplicar na prática conhecimentos de desenvolvimento Android, backend, integração de sistemas e testes de software.
+
+O projeto está documentado e disponível no meu GitHub.
+
+Obrigado pela atenção!
