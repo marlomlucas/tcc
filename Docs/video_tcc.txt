@@ -1,30 +1,39 @@
 ### SLIDE 1 — Apresentação
 
-Olá, meu nome é Marlom Camaran Lucas, sou acadêmico de Engenharia de Software da UniCesumar.
+Olá, meu nome é Marlom Camaran Lucas, sou aluno do curso de Engenharia de Software da UniCesumar.
 
-Meu TCC é o desenvolvimento e a validação de um aplicativo Android para consulta de preços.
+O objetivo e titulo do Meu TCC é o desenvolvimento e a validação de um aplicativo para consulta de preços.
 
-A ideia é utilizar a câmera do celular para ler o código de barras e consultar as informações do produto em um servidor.
+A ideia é utilizar a câmera do celular para ler o código de barras e consultar as informações do produto no servidor.
+
+Além do desenvolvimento do app, também desenvolvi e adicionei testes para verificar o funcionamento do sistema.
+
 
 ### SLIDE 2 — Motivação
 
-A ideia surgiu de um problema comum no comércio: preços que faltam ou que estão incorretos e acabam causando confusão.
+A ideia surgiu de um problema comum em mercados: produtos sem preços ou com preços errados nas gôndolas, causando confusão para os consumidores.
 
-Também existem estabelecimentos onde os verificadores de preços ficam longe ou são poucos.
+Na verdade, essa é uma ideia que tenho há bastante tempo, desde antes de começar a faculdade.
 
-A Lei nº 10.962, de 2004, regulamenta a informação dos preços aos consumidores, e o descumprimento das regras pode gerar multas.
+Isso já aconteceu várias vezes comigo. Às vezes, os verificadores de preços estão longe, estragados ou nem existem.
 
-Então pensei em criar uma forma de consultar os preços diretamente pelo celular.
+E como eu gosto de resolver problemas, pensei em uma forma de facilitar essa consulta.
+
+Como estamos sempre com o celular na mão, veio a ideia de utilizar ele para consultar os preços.
+
+Então comecei a pesquisar as tecnologias necessárias e, durante a faculdade, vi a oportunidade de transformar essa ideia no meu TCC.
+
 
 ### SLIDE 3 — Objetivos
 
-O objetivo principal foi desenvolver e testar um aplicativo Android capaz de consultar produtos pelo código de barras.
+* O objetivo principal foi desenvolver e validar um aplicativo para consultar produtos pelo código de barras.
 
-Primeiro, pesquisei os requisitos e se seria possível fazer o projeto funcionar.
+* Primeiro, pesquisei os requisitos e se seria possível fazer o projeto funcionar.
 
-Depois, estudei sobre APIs, consultas ao banco de dados, funcionamento dos códigos de barras e ferramentas para leitura pela câmera.
+* Depois, estudei sobre APIs, consultas ao banco de dados, funcionamento dos códigos de barras e ferramentas para leitura pela câmera.
 
-Também pesquisei sobre testes de software, para aplicar durante o desenvolvimento.
+* Também pesquisei sobre automatizar testes de software, para facilitar durante o desenvolvimento.
+
 
 ### SLIDE 4 — Kanban e Trello
 
@@ -32,35 +41,40 @@ Também pesquisei sobre testes de software, para aplicar durante o desenvolvimen
 
 Para organizar as tarefas, utilizei o Kanban com o Trello.
 
-Adicionei os cartões iniciais e fui criando novos conforme as ideias e necessidades iam surgindo.
+Adicionei os cartões iniciais e fui adicionando novos conforme ima parecendo ideias e necessidades.
 
-Assim, consegui acompanhar o que estava pendente, em andamento e concluído.
+Assim eu conseguia acompanhar melhor oq faltava e oq já tinha feito.
+
 
 ### SLIDE 5 — Tecnologias utilizadas
 
-Para o Android, escolhi Kotlin porque achei mais simples e por ser recomendada pelo Google.
+Para o Android, escolhi Kotlin porque achei mais simples e por ser recomendada pelo Google que já mantem o Android.
 
 Utilizei o Jetpack Compose para criar as telas do aplicativo.
 
-O CameraX basicamente facilita o uso da câmera.
+O CameraX facilita o uso da câmera. é oq abre ela.
 
-E o ML Kit foi uma das ferramentas que mais achei interessantes, porque utiliza recursos de inteligência artificial para reconhecer imagens. No projeto, ele faz a leitura dos códigos de barras.
+E o ML Kit foi oq achei mais interessante, porque utiliza inteligência artificial para reconhecer imagens. No projeto, é ele que faz a leitura dos códigos de barras.
 
-O MVVM foi utilizado para organizar o código, separando a interface da lógica.
+O MVVM decidir usar pois é um padrão de arquitetura recomendado para organizar o aplicativo, separando a interface da lógica.
 
-O Retrofit faz a comunicação com o backend por HTTP.
+Escolhi o Retrofit porque facilita a comunicação com o backend por HTTP, e o Moshi porque converte o JSON recebido em objetos Kotlin.
 
-O Moshi converte os dados JSON recebidos da API em objetos Kotlin.
+No backend, utilizei Python com Django REST Framework e MySQL para armazenar os produtos.
 
-E o Coil carrega as imagens dos produtos.
+Também utilizei Git e GitHub para controlar as versões. Depois das alterações, executava os testes e, quando estava tudo certo, fazia o commit.
 
-No backend, utilizei Python com Django e Django REST Framework, e o MySQL para armazenar os produtos.
+Cada alteração era seguida de teste e se ok, executava Commit.
 
-Também utilizei Git e GitHub para controlar as versões do projeto.
+E também utilizei o ChatGPT como ferramenta de apoio, principalmente para pesquisas, documentação e para me auxiliar a determinar se certa tecnologia era viável e existe e como fazer. tirar dúvidas e auxiliar na identificação e correção de erros e textos.
+
+Estudei sobre IA e como passar instruções e prompts corretos para ela. E sempre conferindo e testando tudo que ela me passava.
+
+
 
 ### SLIDE 6 — Arquitetura do sistema
 
-**[MOSTRAR O DIAGRAMA]**
+**[MOSTRAR O DIAGRAMA "Slide"]**
 
 Aqui podemos ver como o sistema funciona.
 
@@ -74,13 +88,19 @@ O Django consulta o banco MySQL e retorna as informações em JSON.
 
 Por fim, o aplicativo mostra o nome, a descrição, o preço e a imagem do produto.
 
+
 ### SLIDE 7 — Demonstração do backend
 
 **[MOSTRAR O SERVIDOR NO COMPUTADOR]**
 
-Agora vou mostrar a parte do servidor.
+* Agora vamos ver a parte do servidor.
 
-Aqui eu inicio o Django e podemos ver que o servidor está funcionando.
+Para facilitar a inicialização, criei um arquivo .bat, que é um script simples do Windows que executa os comandos automaticamente.
+
+==> [EXECUTAR O ARQUIVO .BAT]
+
+Aqui eu escolho o modo de rede e o sistema inicia o servidor Django, deixando ele disponível para o aplicativo Android.
+
 
 **[ABRIR DJANGO ADMIN]**
 
@@ -91,6 +111,7 @@ Pelo painel de administração, consigo cadastrar e atualizar os produtos.
 Aqui podemos fazer uma consulta pelo código de barras.
 
 A API busca o produto no banco de dados e retorna as informações em formato JSON.
+
 
 ### SLIDE 8 — Descoberta automática do servidor
 
@@ -103,6 +124,8 @@ Utilizei o mDNS para que o aplicativo encontre o servidor quando os dois estão 
 Assim, não é necessário informar o endereço IP manualmente.
 
 Mas também deixei a configuração manual como alternativa.
+
+
 
 ### SLIDE 9 — Demonstração do aplicativo
 
@@ -118,11 +141,12 @@ Quando encontra o produto, mostra o nome, a descrição, o preço e a imagem na 
 
 Também é possível fazer a consulta digitando o código manualmente.
 
+
 ### SLIDE 10 — Tratamento de erros
 
 **[MOSTRAR OS EXEMPLOS NO APLICATIVO]**
 
-Também implementei o tratamento de erros para evitar que o aplicativo apresente informações incorretas.
+Também implementei tratamento de erros.
 
 Quando encontra o produto, a API retorna o código HTTP 200.
 
@@ -132,36 +156,44 @@ E se o produto não estiver cadastrado, retorna 404.
 
 O aplicativo mostra uma mensagem correspondente a cada situação.
 
+
 ### SLIDE 11 — Resultados e testes
 
 Para verificar o funcionamento, realizei testes no backend, no Android e na integração entre os dois.
 
-No artigo entregue, foram documentados 153 testes e cenários executados, todos aprovados.
+Foram 153 testes e cenários executados e aprovados.
 
-Foram 115 testes no backend, 25 testes unitários no Android e 13 cenários de integração.
+Depois da entrega do artigo, que veio a ideia e pesquisando eu descobri mDNS.
 
-Depois da entrega do artigo, continuei melhorando o projeto.
+Adicionei a descoberta automática do servidor, ampliei os testes e também consegui testar em diferentes celulares.
 
-Adicionei a descoberta automática do servidor, ampliei os testes e também verifiquei o funcionamento em diferentes celulares.
+
 
 ### SLIDE 12 — Melhorias futuras
 
-Apesar de o aplicativo já estar funcionando, ainda existem algumas melhorias que podem ser feitas.
+Apesar de o aplicativo já estar funcionando, ainda existem algumas melhorias que eu quero fazer.
 
-Uma delas seria adicionar a leitura de QR Codes.
+Uma das melhorias futuras seria adicionar a leitura de QR Codes, porque, como eu já trabalhei em mercado, soube que existe uma iniciativa para ir substituindo aos poucos os códigos de barras tradicionais por códigos 2D, como o QR Code.
 
-Outra seria implementar recursos para controle de estoque e relatórios.
+O que mais me interessou foi descobrir que um QR Code pode armazenar mais de 4 mil caracteres.
 
-Também seria possível adaptar o sistema para utilização comercial, com mais segurança e uma infraestrutura adequada.
+Isso facilita muito a rastreabilidade dos produtos, porque permite utilizar uma etiqueta com um identificador único para cada unidade, incluindo informações como lote, validade e muitas outras, ajudando a identificar melhor os produtos dentro do mercado.
 
-Essas são possibilidades para continuar o desenvolvimento futuramente.
+Outra melhoria nesta mesma linha, seria implementar recursos administrativos para controle de estoque e relatórios.
+
 
 ### SLIDE 13 — Conclusão
 
-Com o projeto, consegui atingir o objetivo de desenvolver um aplicativo Android funcional, integrado a uma API REST e a um banco de dados.
+Com este projeto, consegui atingir meu objetivo de desenvolver e validar um aplicativo funcional, integrado a uma API REST e a um banco de dados.
 
-Também consegui aplicar na prática conhecimentos de desenvolvimento Android, backend, integração de sistemas e testes de software.
+Também consegui colocar em prática meus conhecimentos e aprender sobre reconhecimento de imagens, integração de sistemas e testes de software.
+
+Aprendi também a utilizar melhor as ferramentas de inteligência artificial, principalmente na criação de prompts, análise e validação das respostas.
+
+Além disso, ampliei meus conhecimentos sobre controle e rastreabilidade de produtos e tive novas ideias de melhorias, principalmente com o uso de QR Codes.
 
 O projeto está documentado e disponível no meu GitHub.
 
-Obrigado pela atenção!
+Obrigado pela atenção de todos!
+
+E, se tudo der certo, nos vemos na pós-graduação!
