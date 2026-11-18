@@ -1,40 +1,40 @@
-### SLIDE 1 — Apresentação
+21### SLIDE 1 — Apresentação
 
 Olá, meu nome é Marlom Camaran Lucas, sou aluno do curso de Engenharia de Software da UniCesumar.
-
+ppppp
 O objetivo e titulo do Meu TCC é o desenvolvimento e a validação de um aplicativo para consulta de preços.
 
 A ideia é utilizar a câmera do celular para ler o código de barras e consultar as informações do produto no servidor.
-
+pppppppppppppppppppppppp
 Além do desenvolvimento do app, também desenvolvi e adicionei testes para verificar o funcionamento do sistema.
 
 
 ### SLIDE 2 — Motivação
-
+pppp
 A ideia surgiu de um problema comum em mercados: produtos sem preços ou com preços errados nas gôndolas, causando confusão para os consumidores.
 
 Na verdade, essa é uma ideia que tenho há bastante tempo, desde antes de começar a faculdade.
 
-Isso já aconteceu várias vezes comigo. Às vezes, os verificadores de preços estão longe, estragados ou nem existem.
+Isso já aconteceu várias vezes comigo. Às vezes, os verificadores de preços estão longe, estragados ou nem existem.pppp
 
 E como eu gosto de resolver problemas, pensei em uma forma de facilitar essa consulta.
-
+pp
 Como estamos sempre com o celular na mão, veio a ideia de utilizar ele para consultar os preços.
-
+pppp
 Então comecei a pesquisar as tecnologias necessárias e, durante a faculdade, vi a oportunidade de transformar essa ideia no meu TCC.
 
 
 ### SLIDE 3 — Objetivos
-
+pp
 * O objetivo principal foi desenvolver e validar um aplicativo para consultar produtos pelo código de barras.
 
-* Primeiro, pesquisei os requisitos e se seria possível fazer o projeto funcionar.
+* Primeiro, pesquisei os requisitos e se seria possível fazer o projeto funcionar.pppppppp
 
 * Depois, estudei sobre APIs, consultas ao banco de dados, funcionamento dos códigos de barras e ferramentas para leitura pela câmera.
 
 * Também pesquisei sobre automatizar testes de software, para facilitar durante o desenvolvimento.
 
-
+pppp
 ### SLIDE 4 — Kanban e Trello
 
 **[MOSTRAR PRINT DO TRELLO]**
@@ -57,16 +57,16 @@ O CameraX facilita o uso da câmera. é oq abre ela.
 E o ML Kit foi oq achei mais interessante, porque utiliza inteligência artificial para reconhecer imagens. No projeto, é ele que faz a leitura dos códigos de barras.
 
 O MVVM decidir usar pois é um padrão de arquitetura recomendado para organizar o aplicativo, separando a interface da lógica.
-
+ppppppppppp
 Escolhi o Retrofit porque facilita a comunicação com o backend por HTTP, e o Moshi porque converte o JSON recebido em objetos Kotlin.
 
 No backend, utilizei Python com Django REST Framework e MySQL para armazenar os produtos.
-
+pppppppp
 Também utilizei Git e GitHub para controlar as versões. Depois das alterações, executava os testes e, quando estava tudo certo, fazia o commit.
 
 Cada alteração era seguida de teste e se ok, executava Commit.
 
-E também utilizei o ChatGPT como ferramenta de apoio, principalmente para pesquisas, documentação e para me auxiliar a determinar se certa tecnologia era viável e existe e como fazer. tirar dúvidas e auxiliar na identificação e correção de erros e textos.
+E também utilizei o ChatGPT como ferramenta de apoio, principalmente para pesquisas, documentação e para me auxiliar a determinar se certa tecnologia era viável e existe e como fazer. tppppppppppppirar dúvidas e auxiliar na identificação e correção de erros e textos.
 
 Estudei sobre IA e como passar instruções e prompts corretos para ela. E sempre conferindo e testando tudo que ela me passava.
 
